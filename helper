@@ -16,5 +16,6 @@ npm i lodash @types/lodash
 npm i -g json-server
 json-server -p3500 --watch data.json
 http://localhost:3500/courses/123
+ npm i rxjs
 
 1. pages

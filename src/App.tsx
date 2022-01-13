@@ -8,47 +8,38 @@ import { StoreType } from './models/course-store-type';
 import _ from 'lodash';
 import { courseProvider } from './config/servicesConfig';
 import College from './services/college';
+import { Box, List, ListItem } from '@mui/material';
+import PublisherNumbers from './publisher-numbers';
 // import colledge from './services/colledge';
 const college: College = new College(courseProvider)
+
+
+
 const App: FC = () => {
-  const [coursesState, setcoursesState] = useState<StoreType>(initialCourses);
-
+  console.log("start");
+  const [numbers, setNumbers] = useState<number[]>([]);
+  const publisher = new PublisherNumbers();
   useEffect(() => {
-    coursesState.addFn = addCourse;
-    coursesState.removeFn = removeCourse;
-    poller();
-    const interval = setInterval(poller, 500);
-    return () => {
-      clearInterval(interval);
-    }
+    const subscription = publisher.getNumbers().subscribe({
+      next(arr: number[]) {
+        setNumbers(arr);
+      },
+      error(err: any) {
+        console.log(err);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+  function getItems(): ReactNode[] {
+    return numbers.map((n, index) => <ListItem key={index}>{n}</ListItem>);
   }
-  );
+  console.log("after subscribing");
 
-  function addCourse(course: Course) {
-    college.addCourse(course);
-  }
-  function removeCourse(id: number) {
-    college.removeCourse(id);
-    poller();
-  }
-
-  async function poller() {
-    const courses = await college.getAllCourses();
-    coursesState.courses = courses;
-    setcoursesState({ ...coursesState });
-  }
-
-  function getRoutes(): ReactNode[] {
-    return routes.map((e) => <Route key={e.path} path={e.path} element={e.element} />);
-  }
-  return <CoursesContext.Provider value={coursesState}>
-    <BrowserRouter>
-      <NavigatorResposive items={routes} />
-      <Routes>{getRoutes()}
-        <Route path='/' element={<Navigate to={PATH_COURSES} />} />
-      </Routes>
-    </BrowserRouter>
-  </CoursesContext.Provider>
+  return <Box>
+    <List>
+      {getItems()}
+    </List>
+  </Box>
 }
 
 export default App;
