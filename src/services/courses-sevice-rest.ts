@@ -65,8 +65,6 @@ export default class CoursesServiceRest implements CoursesService {
                         }
                     }
                 } catch (err) {
-                    console.log("error in get");
-                    
                     this.currentResponse = "";
                     observer.error(err);
                     clearInterval(interval);
